@@ -13,23 +13,18 @@ class Entry:
         self.description = description
         self.amount = amount 
 
-    
-
 class EntryLogic:
-    """ Each Entry has CRUD functionality which is defined in this class """
+    """ A list of entries and each Entry has CRUD functionality which is defined in this class """
     def __init__(self, entries: list[Entry]):
         self.entries = entries
 
 
-    def validate_entry(): 
-        pass
-
     def add(self, title: str, date: date, entry_type: str, description: str, amount: int, entry_id: int | None = None) -> Entry:
-        if entry_id is None:
+        if entry_id is None: # if a new id wasnt entered, we will create a brand new entry with a new id
             new_id = 1
             if self.entries:
                 new_id = int(self.entries[-1].id) + 1
-        else:
+        else: # if there was an id given, we are just editing an old entry
             new_id = entry_id
 
         new_entry = Entry(new_id, title, date, entry_type, description, amount)
@@ -38,10 +33,10 @@ class EntryLogic:
     
     def delete(self, entry_id: int) -> Entry | None:
         for entry in self.entries:
-            if entry.id == entry_id:
-                self.entries.remove(entry)
-                return entry
-        return None
+            if entry.id == entry_id: 
+                self.entries.remove(entry) # removing it from the entries list
+                return entry # returning the succesfully removed entry
+        return None # if ID did not match check
     
     def update(self, entry_id: int, title: str, date: date, entry_type: str, description: str, amount: int) -> Entry | None:
         for entry in self.entries:
@@ -59,6 +54,7 @@ class EntryLogic:
         
 
     def save_to_file(self, file_path: str | Path) -> None:
+        """Writes current list of entries to JSON file for persistance"""
         data = []
         for entry in self.entries:
             data.append(
@@ -75,8 +71,9 @@ class EntryLogic:
         path = Path(file_path)
         path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
-    @classmethod
+    @classmethod # Creates an EntryLogic object from saved JSON data
     def from_file(cls, file_path: str | Path) -> "EntryLogic":
+        """Retrieves data from json and adds it to the list of entries"""
         path = Path(file_path)
         if not path.exists():
             return cls([])

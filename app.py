@@ -4,11 +4,12 @@ from tkinter import ttk
 from entry import EntryLogic
 
 
-# TO DO: Footer Income Expense and Net Styling 
-# complete edit and save functionality (JSON)
-# 
+# TO DO: summary frame Income Expense and Net Styling 
+# complete edit and save functionality (Using JSON)
+
 
 class IncomeTrackerApp:
+    """Main GUI class for the income and expense tracker."""
     def __init__(self, window: tk.Tk):
         self.window = window
 
@@ -25,11 +26,12 @@ class IncomeTrackerApp:
         self.entries_logic = EntryLogic.from_file(self.data_file)
         self.editing_entry_id: int | None = None
 
-        self._create_input_Area()
+        self._create_input_area()
         self._create_summary_zone()
         self._create_table()
 
-    def _create_input_Area(self):
+    # Build the input form and action buttons for adding or editing entries.    
+    def _create_input_area(self):
 
         label_options = {"padx": 5, "pady": 5, "sticky": "w"}
 
@@ -78,7 +80,7 @@ class IncomeTrackerApp:
 
         self.window.columnconfigure(1, weight=1)
 
-    
+    # Create the Treeview table and bind selection events to enable edit/delete actions.
     def _create_table(self):
 
         style = ttk.Style(self.window)
@@ -121,11 +123,13 @@ class IncomeTrackerApp:
         self._load_entries_into_table()
         self._update_buttons()
 
+        
+
         # self.summary_label = tk.Label(self.window, text="Income: €0   Expense: €0   Net: €0", bg="#f4f6f8", fg="#2f3b4f")
         # self.summary_label.grid(row=9, column=0, columnspan=2, padx=8, pady=(8, 4), sticky="w")
 
         
-
+    # Refresh the summary whenever the entry list changes.
     def _create_summary_zone(self):
         summary_frame = tk.Frame(self.window, bg="#f4f6f8" )
         summary_frame.grid(row=10, column=0, columnspan=4, pady=(10, 10), sticky="ew")
@@ -142,7 +146,6 @@ class IncomeTrackerApp:
         self.net_summary_label.grid(row=9, column=2, sticky="nsew")
 
 
-
     def _update_summary(self) -> None:
         income = self.entries_logic.get_income()
         expense = self.entries_logic.get_expenses()
@@ -151,6 +154,7 @@ class IncomeTrackerApp:
         self.expense_summary_label.config(text=f"Expense: €{expense}")
         self.net_summary_label.config(text=f"Net: €{net}")
 
+    # I wanted delete and edit buttons only to work when a row is selected. 
     def _update_buttons(self, event=None) -> None:
         if self.table.selection():
             self.delete_button.config(command=self.delete_entry, bg="#d86363", fg="white", relief="groove")
@@ -159,6 +163,7 @@ class IncomeTrackerApp:
             self.delete_button.config(command=None, bg="#CFCFCF", fg="white", relief="ridge")
             self.edit_button.config(command=None, bg="#CFCFCF", fg="white", relief="ridge")
 
+    # Refresh of the table by deleting anything left over, and using the items from the backend entries list to fill the tree again
     def _load_entries_into_table(self) -> None:
         for item in self.table.get_children():
             self.table.delete(item)
@@ -173,6 +178,7 @@ class IncomeTrackerApp:
 
         self._update_summary()
 
+    # Clear the form for a new entry, or fill it when editing an existing one.
     def _clear_form(self,new_title: str | None = None, new_date: str | None = None, new_type: str | None = None, new_description: str | None = None,new_amount: int | None = None,) -> None:
         if new_title is None and new_date is None and new_type is None and new_description is None and new_amount is None:
             self.title_var.set("")
@@ -187,6 +193,7 @@ class IncomeTrackerApp:
             self.description_var.set(new_description or "")
             self.amount_var.set(new_amount if new_amount is not None else 0)
 
+    # add_entry updates the visable treeview for for the user and calls the entrylogic add for backend adding of information.
     def add_entry(self) -> None:
         title = self.title_var.get().strip()
         date = self.date_var.get()
@@ -230,7 +237,8 @@ class IncomeTrackerApp:
         except Exception as e:
             print(f"Unsucessful deletion of:", selected_item, "\n", e)
     
-    
+    # start_editing_entry is called when an entry is selected and edit but is clicked. 
+    # It gets the values from the row, updates the input fields, and informs the user which entry they are editing. 
     def _start_editing_entry(self) -> None:
         try:
             selected_item = self.table.selection()
@@ -246,6 +254,9 @@ class IncomeTrackerApp:
         except Exception as e:
             print("Unable to load entry for editing:", e)
 
+
+    # Edit_entry is called from the save def.
+    # When a user clicks save edit_entry, this saves the edited changes in the logic lay and JSON file.
     def edit_entry(self) -> None:
         try:
             if self.editing_entry_id is None:
