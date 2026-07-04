@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from datetime import date
 
 
@@ -22,10 +24,13 @@ class EntryLogic:
     def validate_entry(): 
         pass
 
-    def add(self, title: str, date: date, entry_type: str, description: str, amount: int) -> Entry:
-        new_id = 1
-        if self.entries:
-            new_id = int(self.entries[-1].id) + 1
+    def add(self, title: str, date: date, entry_type: str, description: str, amount: int, entry_id: int | None = None) -> Entry:
+        if entry_id is None:
+            new_id = 1
+            if self.entries:
+                new_id = int(self.entries[-1].id) + 1
+        else:
+            new_id = entry_id
 
         new_entry = Entry(new_id, title, date, entry_type, description, amount)
         self.entries.append(new_entry)
@@ -38,11 +43,62 @@ class EntryLogic:
                 return entry
         return None
     
-    def edit():
-        pass
+    def update(self, entry_id: int, title: str, date: date, entry_type: str, description: str, amount: int) -> Entry | None:
+        for entry in self.entries:
+            if entry.id == entry_id:
+                entry.title = title
+                entry.date = date
+                entry.type = entry_type
+                entry.description = description
+                entry.amount = amount
+                return entry
+        return None
 
-    def save():
-        pass
+    def edit(self, entry_id: int, title: str, date: date, entry_type: str, description: str, amount: int) -> Entry | None:
+        return self.update(entry_id, title, date, entry_type, description, amount)
+        
+
+    def save_to_file(self, file_path: str | Path) -> None:
+        data = []
+        for entry in self.entries:
+            data.append(
+                {
+                    "id": entry.id,
+                    "title": entry.title,
+                    "date": entry.date,
+                    "type": entry.type,
+                    "description": entry.description,
+                    "amount": entry.amount,
+                }
+            )
+
+        path = Path(file_path)
+        path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+    @classmethod
+    def from_file(cls, file_path: str | Path) -> "EntryLogic":
+        path = Path(file_path)
+        if not path.exists():
+            return cls([])
+
+        raw_text = path.read_text(encoding="utf-8").strip()
+        if not raw_text:
+            return cls([])
+
+        payload = json.loads(raw_text)
+        entries = []
+        for item in payload:
+            entries.append(
+                Entry(
+                    item["id"],
+                    item["title"],
+                    item["date"],
+                    item["type"],
+                    item["description"],
+                    item["amount"],
+                )
+            )
+        return cls(entries)
 
     def get_income(self) -> float:
         income = 0
