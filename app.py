@@ -3,11 +3,6 @@ import tkinter as tk
 from tkinter import ttk
 from entry import EntryLogic
 
-
-# TO DO: summary frame Income Expense and Net Styling 
-# complete edit and save functionality (Using JSON)
-
-
 class IncomeTrackerApp:
     """Main GUI class for the income and expense tracker."""
     def __init__(self, window: tk.Tk):
@@ -22,7 +17,7 @@ class IncomeTrackerApp:
         self.type_var = tk.StringVar(value="Income")
         self.description_var = tk.StringVar()
         self.amount_var = tk.IntVar()
-        self.data_file = os.path.join(os.path.dirname(__file__), "data.json")
+        self.data_file = os.path.join(os.path.dirname(__file__), "data.json") 
         self.entries_logic = EntryLogic.from_file(self.data_file)
         self.editing_entry_id: int | None = None
 
@@ -34,13 +29,7 @@ class IncomeTrackerApp:
     def _create_input_area(self):
 
         label_options = {"padx": 5, "pady": 5, "sticky": "w"}
-
-        # style.configure("TLabel", background="#f4f6f8")
-        # style.configure("TButton", padding=6, font=("Segoe UI", 9))
-        # style.configure("Treeview", rowheight=24, fieldbackground="#ffffff")
-        # style = ttk.Style(self.window)
-        # style.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"))
-
+    
         tk.Label(self.window, text="Title", bg="#f4f6f8").grid(row=0, column=0, **label_options)
         tk.Entry(self.window, textvariable=self.title_var, border=1, relief="solid").grid(row=0, column=1, columnspan=2, padx=20, pady=5, sticky="ew")
 
@@ -57,9 +46,6 @@ class IncomeTrackerApp:
         tk.Label(self.window, text="Amount", bg="#f4f6f8").grid(row=4, column=0, **label_options)
         tk.Entry(self.window, textvariable=self.amount_var, width=15, border=1, relief="solid").grid(row=4, column=1, columnspan=2, padx=20, pady=5, sticky="ew")
 
-
-
-    
         # ------- Buttons ----------
         button_frame = tk.Frame(self.window, bg="#f4f6f8")
         button_frame.grid(row=5, column=0, columnspan=4, padx=20, pady=(10, 5), sticky="ew")
@@ -123,23 +109,16 @@ class IncomeTrackerApp:
         self._load_entries_into_table()
         self._update_buttons()
 
-        
 
-        # self.summary_label = tk.Label(self.window, text="Income: €0   Expense: €0   Net: €0", bg="#f4f6f8", fg="#2f3b4f")
-        # self.summary_label.grid(row=9, column=0, columnspan=2, padx=8, pady=(8, 4), sticky="w")
-
-        
     # Refresh the summary whenever the entry list changes.
     def _create_summary_zone(self):
         summary_frame = tk.Frame(self.window, bg="#f4f6f8" )
         summary_frame.grid(row=10, column=0, columnspan=4, pady=(10, 10), sticky="ew")
         summary_frame.columnconfigure((0,1,2), weight=1)
-        style = ttk.Style(summary_frame)
 
         self.income_summary_label = tk.Label(summary_frame, text="Income: €0", bg="#f4f6f8", fg="#2f3b4f")
         self.expense_summary_label = tk.Label(summary_frame, text="Expense: €0", bg="#f4f6f8", fg="#2f3b4f")
         self.net_summary_label = tk.Label(summary_frame, text="Net: €0", bg="#f4f6f8", fg="#2f3b4f")
-        # style.configure(self.income_summary_label, font=("Segoe UI", 9, "bold"))
 
         self.income_summary_label.grid(row=9, column=0, sticky="nsew")
         self.expense_summary_label.grid(row=9, column=1, sticky="nsew")

@@ -3,15 +3,17 @@
 This folder contains a class-based version of the income tracker.
 
 Files:
-- `entries.py` — data model classes for transactions and totals.
+- `entry.py` — data model classes for transactions and totals.
 - `app.py` — the Tkinter application class and UI logic.
-- `__init__.py` — package entry point.
+- `data.json` - entries are stored here for persistance between application logins.
+- `test_entry_logic.py` - test cases on more complex defs and functionality (currently 3 testcases)
+Note: I added the `__init__` file but it is not required for my code to run. (Its just for if I ever want to import the project from outside the current folder)
 
-Run it from the project root:
+Run it from the project root :
 
 ```bash
-python oop_example/app.py
+python py app.py 
 ```
 
-The code separates UI behavior from business data and uses `FinanceModel` to keep totals and entries.
+The code separates UI behavior from business data and uses `Entry` & `EntryLogic` to keep totals and entries logic.
  
